@@ -277,7 +277,7 @@ issues:
     - path: "group/edwards25519/scalar.go"
       linters:
         - ineffassign
-    - path: "pairing/(circl_bls12381|bn254)/."
+    - path: "pairing/(bls12381|bn254)/."
       linters:
         - errcheck #TODO: proper error handling
       text: "Error return value is not checked"

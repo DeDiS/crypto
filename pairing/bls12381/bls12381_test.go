@@ -18,6 +18,7 @@ import (
 	"go.dedis.ch/kyber/v4/internal/test"
 	"go.dedis.ch/kyber/v4/pairing"
 	circl "go.dedis.ch/kyber/v4/pairing/bls12381/circl"
+	"go.dedis.ch/kyber/v4/pairing/bls12381/gnark"
 	kilic "go.dedis.ch/kyber/v4/pairing/bls12381/kilic"
 	"go.dedis.ch/kyber/v4/sign/bdn"
 	"go.dedis.ch/kyber/v4/sign/bls"
@@ -39,6 +40,7 @@ func TestScalarEndianess(t *testing.T) {
 	suites := []pairing.Suite{
 		kilic.NewBLS12381Suite(),
 		circl.NewSuiteBLS12381(),
+		gnark.NewSuiteBLS12381(),
 	}
 
 	seed := "TestScalarEndianess"
@@ -110,6 +112,16 @@ func TestZKCryptoVectorsG1Compressed(t *testing.T) {
 			if err != nil && testCaseValid {
 				panic("Circl: err should be nil")
 			}
+
+			// Test gnark
+			g3 := gnark.G1Elt{}
+			err = g3.UnmarshalBinary(byts)
+			if err == nil && !testCaseValid {
+				panic("Gnark: err should not be nil")
+			}
+			if err != nil && testCaseValid {
+				panic("Gnark: err should be nil")
+			}
 		})
 	}
 }
@@ -156,6 +168,16 @@ func TestZKCryptoVectorsG2Compressed(t *testing.T) {
 			}
 			if err != nil && testCaseValid {
 				panic("Circl: err should be nil")
+			}
+
+			// Test gnark
+			g3 := gnark.G2Elt{}
+			err = g3.UnmarshalBinary(byts)
+			if err == nil && !testCaseValid {
+				panic("Gnark: err should not be nil")
+			}
+			if err != nil && testCaseValid {
+				panic("Gnark: err should be nil")
 			}
 		})
 	}
@@ -401,6 +423,7 @@ func TestKyberG1(t *testing.T) {
 	suites := []pairing.Suite{
 		kilic.NewBLS12381Suite(),
 		circl.NewSuiteBLS12381(),
+		gnark.NewSuiteBLS12381(),
 	}
 
 	for _, suite := range suites {
@@ -412,6 +435,7 @@ func TestKyberG2(t *testing.T) {
 	suites := []pairing.Suite{
 		kilic.NewBLS12381Suite(),
 		circl.NewSuiteBLS12381(),
+		gnark.NewSuiteBLS12381(),
 	}
 
 	for _, suite := range suites {
@@ -423,6 +447,7 @@ func TestKyberPairingG2(t *testing.T) {
 	suites := []pairing.Suite{
 		kilic.NewBLS12381Suite(),
 		circl.NewSuiteBLS12381(),
+		gnark.NewSuiteBLS12381(),
 	}
 
 	for _, s := range suites {
@@ -450,6 +475,7 @@ func TestRacePairings(_ *testing.T) {
 	suites := []pairing.Suite{
 		kilic.NewBLS12381Suite(),
 		circl.NewSuiteBLS12381(),
+		gnark.NewSuiteBLS12381(),
 	}
 
 	for _, s := range suites {
@@ -474,6 +500,7 @@ func TestKyberBLSG2(t *testing.T) {
 	suites := []pairing.Suite{
 		kilic.NewBLS12381Suite(),
 		circl.NewSuiteBLS12381(),
+		gnark.NewSuiteBLS12381(),
 	}
 
 	for _, suite := range suites {
@@ -486,6 +513,7 @@ func TestKyberBLSG1(t *testing.T) {
 	suites := []pairing.Suite{
 		kilic.NewBLS12381Suite(),
 		circl.NewSuiteBLS12381(),
+		gnark.NewSuiteBLS12381(),
 	}
 
 	for _, suite := range suites {
@@ -498,6 +526,7 @@ func TestKyberThresholdG2(t *testing.T) {
 	suites := []pairing.Suite{
 		kilic.NewBLS12381Suite(),
 		circl.NewSuiteBLS12381(),
+		gnark.NewSuiteBLS12381(),
 	}
 
 	for _, suite := range suites {
@@ -510,6 +539,7 @@ func TestKyberThresholdG1(t *testing.T) {
 	suites := []pairing.Suite{
 		kilic.NewBLS12381Suite(),
 		circl.NewSuiteBLS12381(),
+		gnark.NewSuiteBLS12381(),
 	}
 
 	for _, suite := range suites {
@@ -522,6 +552,7 @@ func TestIsValidGroup(t *testing.T) {
 	suites := []pairing.Suite{
 		kilic.NewBLS12381Suite(),
 		circl.NewSuiteBLS12381(),
+		gnark.NewSuiteBLS12381(),
 	}
 
 	for _, suite := range suites {
@@ -550,6 +581,7 @@ func TestBasicPairing(t *testing.T) {
 	suites := []pairing.Suite{
 		kilic.NewBLS12381Suite(),
 		circl.NewSuiteBLS12381(),
+		gnark.NewSuiteBLS12381(),
 	}
 
 	for _, suite := range suites {
@@ -602,6 +634,7 @@ func BenchmarkPairingSeparate(bb *testing.B) {
 	var suites = []pairing.Suite{
 		kilic.NewBLS12381Suite(),
 		circl.NewSuiteBLS12381(),
+		gnark.NewSuiteBLS12381(),
 	}
 
 	for _, s := range suites {
@@ -631,6 +664,7 @@ func BenchmarkPairingInv(bb *testing.B) {
 	var suites = []pairing.Suite{
 		kilic.NewBLS12381Suite(),
 		circl.NewSuiteBLS12381(),
+		gnark.NewSuiteBLS12381(),
 	}
 
 	for _, s := range suites {
@@ -658,7 +692,7 @@ func BenchmarkPairingInv(bb *testing.B) {
 var (
 	dataSize     = 32
 	numSigs      = []int{1, 10, 100, 1000, 10000}
-	curveOptions = []string{"kilic", "circl"}
+	curveOptions = []string{"kilic", "circl", "gnark"}
 )
 
 // Used to avoid compiler optimizations
@@ -671,6 +705,9 @@ func BenchmarkKilic(b *testing.B) {
 
 func BenchmarkCircl(b *testing.B) {
 	BDNBenchmark(b, "circl")
+}
+func BenchmarkGnark(b *testing.B) {
+	BLSBenchmark(b, "gnark")
 }
 
 //nolint: gocyclo,cyclop // breaking this down doesn't make sense
@@ -698,6 +735,8 @@ func BDNBenchmark(b *testing.B, curveOption string) {
 		suite = kilic.NewBLS12381Suite()
 	case "circl":
 		suite = circl.NewSuiteBLS12381()
+	case "gnark":
+		suite = gnark.NewSuiteBLS12381()
 	default:
 		panic(fmt.Errorf("invalid curve option: %s", curveOption))
 	}
