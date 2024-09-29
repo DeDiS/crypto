@@ -2,6 +2,7 @@ package circl
 
 import (
 	"crypto/cipher"
+	"fmt"
 	"io"
 	"math/big"
 
@@ -60,6 +61,14 @@ func (s *Scalar) SetInt64(v int64) kyber.Scalar {
 	}
 
 	return s
+}
+
+func (s *Scalar) SetIntString(v string) (kyber.Scalar, error) {
+	err := s.inner.SetString(v)
+	if err != nil {
+		return nil, fmt.Errorf("unable to set string number: %v", err)
+	}
+	return s, nil
 }
 
 func (s *Scalar) Zero() kyber.Scalar { s.inner.SetUint64(0); return s }

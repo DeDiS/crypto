@@ -64,7 +64,10 @@ func TestMinimumT(t *testing.T) {
 
 func TestVSSWhole(t *testing.T) {
 	dealer, verifiers := genAll()
+	vssWhole(t, dealer, verifiers, secret)
+}
 
+func vssWhole(t *testing.T, dealer *Dealer, verifiers []*Verifier, secret kyber.Scalar) {
 	// 1. dispatch deal
 	resps := make([]*Response, nbVerifiers)
 	encDeals, err := dealer.EncryptedDeals()
@@ -591,6 +594,15 @@ func TestVSSContext(t *testing.T) {
 	assert.Len(t, c, suite.Hash().Size())
 }
 
+func TestDeterministicStringSecret(t *testing.T) {
+	deterministicSec, err := suite.Scalar().SetIntString("0x123456789abcdef")
+	require.NoError(t, err)
+	dealer, err := NewDealer(suite, dealerSec, deterministicSec, verifiersPub, vssThreshold)
+	require.NoError(t, err)
+	verifiers := genVerifiers()
+	vssWhole(t, dealer, verifiers, deterministicSec)
+}
+
 func genPair() (kyber.Scalar, kyber.Point) {
 	secret := suite.Scalar().Pick(suite.RandomStream())
 	public := suite.Point().Mul(secret, nil)
@@ -612,13 +624,16 @@ func genDealer() *Dealer {
 }
 
 func genAll() (*Dealer, []*Verifier) {
-	dealer := genDealer()
+	return genDealer(), genVerifiers()
+}
+
+func genVerifiers() []*Verifier {
 	var verifiers = make([]*Verifier, nbVerifiers)
 	for i := 0; i < nbVerifiers; i++ {
 		v, _ := NewVerifier(suite, verifiersSec[i], dealerPub, verifiersPub)
 		verifiers[i] = v
 	}
-	return dealer, verifiers
+	return verifiers
 }
 
 func randomBytes(n int) []byte {

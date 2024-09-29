@@ -59,6 +59,14 @@ func (s *scalar) SetInt64(v int64) kyber.Scalar {
 	return s.setInt(mod.NewInt64(v, primeOrder))
 }
 
+func (s *scalar) SetIntString(v string) (kyber.Scalar, error) {
+	i, ok := new(big.Int).SetString(v, 0)
+	if !ok {
+		return nil, errors.New("invalid scalar string")
+	}
+	return s.setInt(mod.NewInt(i, primeOrder)), nil
+}
+
 func (s *scalar) toInt() *mod.Int {
 	return mod.NewIntBytes(s.v[:], primeOrder, defaultEndianess)
 }

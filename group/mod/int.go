@@ -6,6 +6,7 @@ import (
 	"crypto/cipher"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"io"
 	"math/big"
 
@@ -171,6 +172,15 @@ func (i *Int) One() kyber.Scalar {
 func (i *Int) SetInt64(v int64) kyber.Scalar {
 	i.V.SetInt64(v).Mod(&i.V, i.M)
 	return i
+}
+
+func (i *Int) SetIntString(v string) (kyber.Scalar, error) {
+	bigV := new(big.Int)
+	bigV, ok := bigV.SetString(v, 0)
+	if !ok {
+		return nil, fmt.Errorf("unable to set string number: %v", v)
+	}
+	return i.Init(bigV, i.M), nil
 }
 
 // Int64 returns the int64 representation of the value.

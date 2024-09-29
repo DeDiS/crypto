@@ -35,6 +35,9 @@ type Scalar interface {
 	// SetInt64 sets the receiver to a small integer value.
 	SetInt64(v int64) Scalar
 
+	// SetIntString sets the receiver to a string encoded integer value.
+	SetIntString(v string) (Scalar, error)
+
 	// Set to the additive identity (0).
 	Zero() Scalar
 
